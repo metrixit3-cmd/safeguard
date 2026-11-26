@@ -7,7 +7,7 @@
 SAFEGUARD pairs an account with a phone browser companion, displays the phone’s latest reported GPS location, and syncs Theft Mode alerts while the companion is active and connected.
 
 ![Project status: in development](https://img.shields.io/badge/status-in%20development-39d5c7?style=for-the-badge)
-![Node.js 20+](https://img.shields.io/badge/Node.js-20%2B-43853d?style=for-the-badge&logo=node.js&logoColor=white)
+![Node.js 20.19+](https://img.shields.io/badge/Node.js-20.19%2B-43853d?style=for-the-badge&logo=node.js&logoColor=white)
 ![Express 5](https://img.shields.io/badge/Express-5-111111?style=for-the-badge&logo=express)
 ![MongoDB](https://img.shields.io/badge/MongoDB-supported-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
 ![MapLibre GL JS](https://img.shields.io/badge/Maps-MapLibre%20GL%20JS-396CB2?style=for-the-badge)
@@ -50,7 +50,7 @@ Background tracking and operating-system controls require native apps, platform 
 
 ### Requirements
 
-- Node.js 20 or newer
+- Node.js 20.19 or newer
 - MongoDB at `mongodb://127.0.0.1:27017/safeguard` for persistent accounts, devices, GPS reports, and events (optional for local evaluation)
 
 ### Start the app
