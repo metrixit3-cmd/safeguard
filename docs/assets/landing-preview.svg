@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 820" role="img" aria-labelledby="title desc">
+  <title id="title">SAFEGUARD landing page preview</title>
+  <desc id="desc">Illustrative dark glass interface with product headline, feature cards and a city map panel.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#07101d"/><stop offset="1" stop-color="#101d30"/></linearGradient>
+    <linearGradient id="glass" x2="0.8" y2="1"><stop stop-color="#17263a" stop-opacity=".94"/><stop offset="1" stop-color="#0d1727" stop-opacity=".96"/></linearGradient>
+    <linearGradient id="teal" x2="1"><stop stop-color="#36d2c4"/><stop offset="1" stop-color="#74e8d9"/></linearGradient>
+    <linearGradient id="map" x2="1" y2="1"><stop stop-color="#142b3a"/><stop offset=".55" stop-color="#1d3845"/><stop offset="1" stop-color="#263747"/></linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="18" stdDeviation="20" flood-color="#000" flood-opacity=".38"/></filter>
+    <pattern id="blocks" width="190" height="150" patternUnits="userSpaceOnUse" patternTransform="rotate(-14)">
+      <rect x="12" y="15" width="48" height="34" rx="5" fill="#7d9c98" opacity=".23"/><rect x="72" y="13" width="74" height="42" rx="5" fill="#90a7a1" opacity=".2"/>
+      <rect x="20" y="74" width="86" height="51" rx="5" fill="#536f71" opacity=".36"/><rect x="120" y="73" width="48" height="52" rx="5" fill="#849a93" opacity=".25"/>
+    </pattern>
+  </defs>
+  <rect width="1440" height="820" rx="32" fill="url(#bg)"/>
+  <path d="M0 110h1440" stroke="#ffffff" stroke-opacity=".07"/>
+  <g font-family="Inter,Segoe UI,Arial,sans-serif" fill="#f1f5fa">
+    <path d="M66 43h30v34H66z" fill="none" stroke="#41ddcf" stroke-width="3"/><path d="m77 59 5 5 11-13" fill="none" stroke="#41ddcf" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="110" y="70" font-size="23" font-weight="750" letter-spacing="3">SAFEGUARD</text>
+    <text x="738" y="68" font-size="15" fill="#aab8c9">Features</text><text x="835" y="68" font-size="15" fill="#aab8c9">How it works</text><text x="970" y="68" font-size="15" fill="#aab8c9">Platform support</text>
+    <rect x="1194" y="30" width="91" height="48" rx="12" fill="#19263a" stroke="#ffffff" stroke-opacity=".1"/><text x="1215" y="60" font-size="14" font-weight="650">Sign in</text>
+    <rect x="1295" y="30" width="104" height="48" rx="12" fill="url(#teal)"/><text x="1311" y="60" font-size="14" font-weight="750" fill="#052127">Get started</text>
+    <text x="72" y="175" font-size="13" font-weight="750" letter-spacing="3" fill="#41ddcf">A LITTLE MORE PEACE OF MIND</text>
+    <text x="72" y="270" font-size="66" font-weight="750" letter-spacing="-2">Your phone.</text><text x="72" y="345" font-size="66" font-weight="750" letter-spacing="-2" fill="#42d6c8">Your control.</text><text x="72" y="420" font-size="66" font-weight="750" letter-spacing="-2">Even after theft.</text>
+    <text x="74" y="482" font-size="18" fill="#aab8c9">See the latest location shared by your paired phone.</text><text x="74" y="510" font-size="18" fill="#aab8c9">Manage browser-based alerts from one secure account.</text>
+    <rect x="72" y="552" width="190" height="56" rx="14" fill="url(#teal)"/><text x="97" y="587" font-size="16" font-weight="750" fill="#052127">Create an account ↗</text>
+    <rect x="274" y="552" width="170" height="56" rx="14" fill="#111c2c" stroke="#ffffff" stroke-opacity=".11"/><text x="302" y="587" font-size="15" font-weight="650">Explore features</text>
+    <text x="74" y="649" font-size="13" fill="#8fa0b4">GPS updates require permission and an active companion page.</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="720" y="145" width="650" height="526" rx="28" fill="url(#glass)" stroke="#ffffff" stroke-opacity=".12"/>
+    <rect x="735" y="160" width="620" height="496" rx="21" fill="url(#map)"/>
+    <rect x="735" y="160" width="620" height="496" rx="21" fill="url(#blocks)"/>
+    <path d="M724 365 1361 275M708 488 1372 395M840 149 930 675M1100 150 1180 672" fill="none" stroke="#d4d9ca" stroke-opacity=".27" stroke-width="14"/>
+    <path d="M720 365 1361 275M708 488 1372 395M840 149 930 675M1100 150 1180 672" fill="none" stroke="#213742" stroke-opacity=".8" stroke-width="3"/>
+    <path d="M990 173v475M1257 166v490M745 565l603-97" fill="none" stroke="#58b6ac" stroke-opacity=".36" stroke-width="5" stroke-dasharray="16 14"/>
+    <g fill="#647c7b" opacity=".72"><path d="m800 226 42-7 9 29-44 8z"/><path d="m954 214 34-3 7 25-38 7z"/><path d="m1202 215 39-8 13 30-47 8z"/><path d="m1031 525 34-3 7 34-39 4z"/><path d="m1277 538 48-7 7 26-51 6z"/><path d="m766 414 32-7 6 34-35 3z"/><path d="m1131 329 40-8 7 29-43 6z"/></g>
+  </g>
+  <g font-family="Inter,Segoe UI,Arial,sans-serif">
+    <rect x="764" y="183" width="260" height="40" rx="11" fill="#09131f" fill-opacity=".88" stroke="#ffffff" stroke-opacity=".16"/>
+    <rect x="774" y="191" width="74" height="24" rx="7" fill="#39d4c5" fill-opacity=".2"/><text x="785" y="208" fill="#9cf6eb" font-size="11" font-weight="700">3D DARK</text><text x="860" y="208" fill="#b9c5d2" font-size="11">STREET</text><text x="930" y="208" fill="#b9c5d2" font-size="11">SATELLITE</text>
+    <rect x="1043" y="178" width="276" height="83" rx="15" fill="#101c2b" stroke="#ffffff" stroke-opacity=".16"/>
+    <text x="1063" y="204" fill="#48dfd0" font-size="11" font-weight="700" letter-spacing="2">LATEST PHONE REPORT</text><text x="1063" y="229" fill="#f1f5fa" font-size="15" font-weight="650">Waiting for paired phone GPS</text><text x="1063" y="247" fill="#aab8c9" font-size="11">No sample location is shown</text>
+    <circle cx="1057" cy="405" r="30" fill="#39d4c5" fill-opacity=".18"/><circle cx="1057" cy="405" r="19" fill="#39d4c5" fill-opacity=".28"/><circle cx="1057" cy="405" r="9" fill="#52e7d8" stroke="#e3fffb" stroke-width="3"/>
+    <rect x="758" y="603" width="273" height="34" rx="9" fill="#07111e" fill-opacity=".83"/><text x="773" y="625" fill="#d1dce7" font-size="11">Map preview · awaiting live device report</text>
+  </g>
+  <text x="72" y="765" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="12" fill="#8192a7">Illustrative product interface · the live map uses external tiles when served by the app.</text>
+</svg>
