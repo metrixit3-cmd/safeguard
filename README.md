@@ -111,9 +111,16 @@ The service exposes account, device pairing, GPS, Theft Mode, security event, da
 | Map | MapLibre GL JS, OpenFreeMap/CARTO styles, Esri imagery option |
 | Phone companion | Browser Geolocation API, device-scoped token, active-page polling |
 
-## Vercel status
+## Deploy to Vercel
 
-The repository is not yet linked to a Vercel project or deployed. The current app is an Express server that connects to MongoDB and starts with `npm start`; deployment needs a Vercel-compatible serverless entry point and a reachable hosted MongoDB connection. Do not deploy with the local MongoDB URL or rely on process-memory fallback for production persistence.
+The Express app exports a Vercel-compatible handler. Static assets are served from `public/`; authenticated customer and admin HTML lives in `private-pages/` and passes through server-side role checks. Production API requests require persistent MongoDB and fail clearly if it is unavailable instead of falling back to temporary memory.
+
+1. Import `metrixit3-cmd/safeguard` into a Vercel project with the repository root as the project root. Vercel detects the Express app in `server.mjs`.
+2. Add `MONGODB_URI` using a MongoDB Atlas connection string. Allow the Vercel function to reach the Atlas cluster and keep the database username/password private.
+3. Add `JWT_SECRET` as a randomly generated secret with at least 32 characters. Add `ADMIN_EMAILS` with the administrator email. Set `ADMIN_BOOTSTRAP_SECRET` only while creating the first administrator, then remove it.
+4. Deploy. Check `/api/health`; it should return `{"status":"ok","database":"connected"}` before using account, device, or GPS features.
+
+Do not set `MONGODB_URI` to `127.0.0.1` in production: it points to the deployment container, not your computer. GPS collection requires a paired phone with an open, permission-granted companion page; browser hosting does not provide OS-level remote lock or reset protection.
 
 ## Documentation
 

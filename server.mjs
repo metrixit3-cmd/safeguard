@@ -11,8 +11,10 @@ import { join } from 'node:path';
 
 const app = express();
 const staticRoot = join(fileURLToPath(new URL('.', import.meta.url)), 'public');
-const mongoUrl = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/safeguard';
-const port = Number(process.env.PORT)||4173, host=process.env.HOST||'127.0.0.1';
+const privatePagesRoot = join(fileURLToPath(new URL('.', import.meta.url)), 'private-pages');
+const productionMode = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
+const mongoUrl = process.env.MONGODB_URI || (productionMode ? '' : 'mongodb://127.0.0.1:27017/safeguard');
+const port = Number(process.env.PORT)||4173, host=process.env.HOST||'0.0.0.0';
 let databaseReady=false, memoryMode=true;
 const memoryUsers=new Map(), memoryDevices=new Map();
 const jwtSecret = process.env.JWT_SECRET;
@@ -20,11 +22,11 @@ const adminEmails=new Set(String(process.env.ADMIN_EMAILS||'').split(',').map(em
 const adminBootstrapSecret=process.env.ADMIN_BOOTSTRAP_SECRET||'';
 const configuredCorsOrigins=new Set(String(process.env.CORS_ALLOWED_ORIGINS||'').split(',').map(origin=>origin.trim().replace(/\/$/,'')).filter(Boolean));
 if(jwtSecret&&Buffer.byteLength(jwtSecret,'utf8')<32)throw new Error('JWT_SECRET must contain at least 32 UTF-8 bytes.');
-if(!jwtSecret&&process.env.NODE_ENV==='production')throw new Error('Set a random JWT_SECRET of at least 32 characters before starting in production.');
+if(!jwtSecret&&productionMode)throw new Error('Set a random JWT_SECRET of at least 32 characters before starting in production.');
 const secret=jwtSecret||randomBytes(48).toString('base64url');
 if(!jwtSecret)console.warn('JWT_SECRET is unset; this local run is using a random, temporary key. Sessions will expire when the server restarts. Set JWT_SECRET to preserve sessions.');
 app.disable('x-powered-by');
-app.set('trust proxy', process.env.TRUST_PROXY === '1' ? 1 : false);
+app.set('trust proxy', productionMode || process.env.TRUST_PROXY === '1' ? 1 : false);
 app.use(helmet({
   crossOriginEmbedderPolicy: false,
   contentSecurityPolicy: { directives: {
@@ -36,7 +38,8 @@ app.use(express.json({ limit: '40kb', type: 'application/json' }));
 app.use(cookieParser());
 function allowedOrigin(origin,req){try{const url=new URL(origin);if(!['http:','https:'].includes(url.protocol))return false;if(configuredCorsOrigins.has(url.origin))return true;const host=String(req.get('host')||'').toLowerCase();if(url.host.toLowerCase()!==host)return false;const localHttpHosts=new Set(['localhost','localhost:80','127.0.0.1','127.0.0.1:80','[::1]','[::1]:80']);return url.protocol==='https:'||(url.protocol==='http:'&&localHttpHosts.has(host))}catch{return false}}
 app.use((req,res,next)=>{const origin=req.get('origin');if(!origin)return next();if(!allowedOrigin(origin,req))return req.path.startsWith('/api/')?res.status(403).json({error:'Origin is not allowed.'}):next();res.setHeader('Access-Control-Allow-Origin',origin);res.setHeader('Access-Control-Allow-Credentials','true');res.vary('Origin');res.setHeader('Access-Control-Allow-Methods','GET,POST,PATCH,DELETE,OPTIONS');res.setHeader('Access-Control-Allow-Headers','Content-Type,Authorization');if(req.method==='OPTIONS')return res.sendStatus(204);next()});
-app.get('/api/health', (_req,res)=>{const database=databaseReady&&!memoryMode?'connected':'memory';res.status(200).json({status:database==='connected'?'ok':'degraded',database})});
+app.get('/api/health', async (_req,res)=>{if(productionMode&&!databaseReady)await connectDatabase();const database=databaseReady&&!memoryMode?'connected':productionMode?'unavailable':'memory';res.status(database==='unavailable'?503:200).json({status:database==='connected'?'ok':database==='memory'?'degraded':'unavailable',database})});
+app.use('/api', async (_req,res,next)=>{if(!productionMode)return next();if(await connectDatabase())return next();return res.status(503).json({error:'Persistent storage is unavailable. Configure MONGODB_URI and verify the database network allowlist.'})});
 
 const eventSchema = new mongoose.Schema({ kind: { type: String, required: true }, message: { type: String, required: true }, at: { type: Date, default: Date.now } }, { _id: false });
 const userSchema = new mongoose.Schema({ fullName: { type: String, required: true, maxlength: 100 }, email: { type: String, required: true, unique: true, lowercase: true, trim: true }, role:{type:String,enum:['customer','admin'],default:'customer'},passwordHash: { type: String, required: true }, trialStartedAt: { type: Date, required: true }, trialEndsAt: { type: Date, required: true }, createdAt: { type: Date, default: Date.now } });
@@ -109,15 +112,16 @@ app.get('/api/phone/state', deviceAuth, async (req,res)=>{const d=memoryMode?mem
 app.post('/api/phone/unpair',deviceAuth,async(req,res)=>{const d=memoryMode?memoryDevices.get(req.deviceClaims.sub):await Device.findById(req.deviceClaims.sub);if(!d||req.deviceClaims.version!==d.deviceTokenVersion)return res.status(401).json({error:'Phone pairing has expired.'});d.deviceTokenVersion+=1;d.pairedAt=null;addEvent(d,'phone_unpaired','The phone companion was unpaired.');await saveDevice(d);res.json({ok:true})});
 app.post('/api/phone/location', deviceAuth, async (req,res)=>{const d=memoryMode?memoryDevices.get(req.deviceClaims.sub):await Device.findById(req.deviceClaims.sub);if(!d||req.deviceClaims.version!==d.deviceTokenVersion)return res.status(401).json({error:'Phone pairing has expired.'});if(!d.locationSharingEnabled)return res.status(403).json({error:'Location sharing is paused from your dashboard.'}); const {latitude,longitude,accuracy}=req.body||{}; if(!Number.isFinite(latitude)||latitude < -90||latitude>90||!Number.isFinite(longitude)||longitude < -180||longitude>180||!Number.isFinite(accuracy)||accuracy<0||accuracy>100000)return res.status(400).json({error:'Location coordinates are invalid.'}); d.lastLocation={latitude,longitude,accuracy,recordedAt:new Date()}; if(!d.lastLocationEventAt||Date.now()-new Date(d.lastLocationEventAt).getTime()>10*60*1000){addEvent(d,'location_received','A GPS location was received from the paired phone.');d.lastLocationEventAt=new Date()} await saveDevice(d);res.json({received:true,recordedAt:d.lastLocation.recordedAt});});
 async function resolveSessionUser(req){const token=req.cookies.sg_session;if(!token)throw new Error('No session');const claims=jwt.verify(token,secret,{issuer:'safeguard',audience:'safeguard-web'});if(claims.type!=='account')throw new Error('Invalid session');const user=memoryMode?memoryUsers.get(claims.sub):await User.findById(claims.sub);if(!user)throw new Error('Expired session');return user}
-app.get('/app.html',async(req,res)=>{try{const user=await resolveSessionUser(req);if(userRole(user)==='admin')return res.redirect(302,'/admin.html');res.sendFile(join(staticRoot,'app.html'))}catch{res.redirect(302,'/auth.html?next=%2Fapp.html')}});
-app.get('/admin.html',async(req,res)=>{try{const user=await resolveSessionUser(req);if(userRole(user)!=='admin')return res.redirect(302,'/auth.html?next=%2Fadmin.html');res.sendFile(join(staticRoot,'admin.html'))}catch{res.redirect(302,'/auth.html?next=%2Fadmin.html')}});
+app.get('/app.html',async(req,res)=>{if(!req.cookies.sg_session)return res.redirect(302,'/auth.html?next=%2Fapp.html');try{if(productionMode&&!await connectDatabase())return res.status(503).send('SAFEGUARD storage is not configured. Set MONGODB_URI in your hosting environment.');const user=await resolveSessionUser(req);if(userRole(user)==='admin')return res.redirect(302,'/admin.html');res.sendFile(join(privatePagesRoot,'app.html'))}catch{res.redirect(302,'/auth.html?next=%2Fapp.html')}});
+app.get('/admin.html',async(req,res)=>{if(!req.cookies.sg_session)return res.redirect(302,'/auth.html?next=%2Fadmin.html');try{if(productionMode&&!await connectDatabase())return res.status(503).send('SAFEGUARD storage is not configured. Set MONGODB_URI in your hosting environment.');const user=await resolveSessionUser(req);if(userRole(user)!=='admin')return res.redirect(302,'/auth.html?next=%2Fadmin.html');res.sendFile(join(privatePagesRoot,'admin.html'))}catch{res.redirect(302,'/auth.html?next=%2Fadmin.html')}});
 app.get('/phone', (_req,res)=>res.redirect('/phone.html'));
 app.use(express.static(staticRoot, { index: 'index.html', fallthrough:true, dotfiles:'deny', maxAge:process.env.NODE_ENV==='production'?'1h':0 }));
 app.use((req,res)=>{if(req.path.startsWith('/api/'))return res.status(404).json({error:'API route not found.'});res.status(404).send('Not found');});
 app.use((error,req,res,_next)=>{console.error('request_failed',error.message);res.status(500).json({error:'Something went wrong. Please try again.'});});
 
-app.listen(port,host,()=>console.log(`SAFEGUARD listening at http://${host}:${port}`));
 mongoose.connection.on('disconnected',()=>{databaseReady=false;memoryMode=true});
-let mongoRetryDelay=5000,mongoUnavailableLogged=false;
-async function connectDatabase(){try{await mongoose.connect(mongoUrl,{serverSelectionTimeoutMS:3000,autoIndex:true});await Promise.all([User.init(),Device.init()]);databaseReady=true;mongoRetryDelay=5000;if(memoryUsers.size||memoryDevices.size){memoryMode=true;console.warn('MongoDB is available, but this process already has memory-mode accounts. Restart to switch storage modes safely.')}else{memoryMode=false;mongoUnavailableLogged=false;console.log('MongoDB connected and indexes ready.')}}catch(error){databaseReady=false;memoryMode=true;if(!mongoUnavailableLogged){console.warn(`MongoDB unavailable; using process-memory account storage. Retry interval will back off up to 60 seconds. ${error.message}`);mongoUnavailableLogged=true}if(memoryUsers.size||memoryDevices.size)return;const delay=mongoRetryDelay;mongoRetryDelay=Math.min(mongoRetryDelay*2,60000);const retry=setTimeout(connectDatabase,delay);retry.unref()}}
-connectDatabase();
+let mongoRetryDelay=5000,mongoUnavailableLogged=false,databaseConnectPromise=null;
+async function connectDatabase(){if(databaseReady&&mongoose.connection.readyState===1&&!memoryMode)return true;if(databaseConnectPromise)return databaseConnectPromise;databaseConnectPromise=(async()=>{try{if(!mongoUrl)throw new Error('MONGODB_URI is required in production.');await mongoose.connect(mongoUrl,{serverSelectionTimeoutMS:5000,autoIndex:true});await Promise.all([User.init(),Device.init()]);databaseReady=true;mongoRetryDelay=5000;if(!productionMode&&(memoryUsers.size||memoryDevices.size)){memoryMode=true;console.warn('MongoDB is available, but this process already has memory-mode accounts. Restart to switch storage modes safely.')}else{memoryMode=false;mongoUnavailableLogged=false;console.log('MongoDB connected and indexes ready.')}return true}catch(error){databaseReady=false;memoryMode=!productionMode;if(!mongoUnavailableLogged){console.warn(`${productionMode?'Production database unavailable':'MongoDB unavailable; using process-memory account storage'}. ${error.message}`);mongoUnavailableLogged=true}if(!productionMode){const delay=mongoRetryDelay;mongoRetryDelay=Math.min(mongoRetryDelay*2,60000);const retry=setTimeout(()=>{void connectDatabase()},delay);retry.unref()}return false}finally{databaseConnectPromise=null}})();return databaseConnectPromise}
+void connectDatabase();
+if(process.env.VERCEL!=='1')app.listen(port,host,()=>console.log(`SAFEGUARD listening at http://${host}:${port}`));
+export default app;
