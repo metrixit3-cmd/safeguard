@@ -2,7 +2,7 @@
 
 ## Vercel
 
-Import the repository root as a Node.js project. `server.mjs` exports the Express app for Vercel Functions, while local `npm start` still starts an HTTP server. `vercel.json` includes `private-pages/**` in the function bundle. Keep `app.html` and `admin.html` in that private directory: Vercel serves `public/**` directly from its CDN, so protected HTML must not be placed there.
+Import the repository root as a Node.js project. `server.mjs` exports the Express app for Vercel Functions, while local `npm start` still starts an HTTP server. The authenticated customer and admin HTML is bundled as an imported private server module. Keep these pages out of `public/**`, which Vercel serves directly from its CDN.
 
 Configure these Vercel environment variables for Production and Preview as needed:
 

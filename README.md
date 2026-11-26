@@ -113,7 +113,7 @@ The service exposes account, device pairing, GPS, Theft Mode, security event, da
 
 ## Deploy to Vercel
 
-The Express app exports a Vercel-compatible handler. Static assets are served from `public/`; authenticated customer and admin HTML lives in `private-pages/` and passes through server-side role checks. Production API requests require persistent MongoDB and fail clearly if it is unavailable instead of falling back to temporary memory.
+The Express app exports a Vercel-compatible handler. Static assets are served from `public/`; authenticated customer and admin HTML is bundled in a private server module and passes through server-side role checks. Production API requests require persistent MongoDB and fail clearly if it is unavailable instead of falling back to temporary memory.
 
 1. Import `metrixit3-cmd/safeguard` into a Vercel project with the repository root as the project root. Vercel detects the Express app in `server.mjs`.
 2. Add `MONGODB_URI` using a MongoDB Atlas connection string. Allow the Vercel function to reach the Atlas cluster and keep the database username/password private.

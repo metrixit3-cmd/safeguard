@@ -1,7 +1,0 @@
-{
-  "functions": {
-    "server.mjs": {
-      "includeFiles": "private-pages/**"
-    }
-  }
-}

@@ -5,7 +5,7 @@
   "description": "SAFEGUARD account, device companion and security platform",
   "scripts": {
     "start": "node --env-file-if-exists=.env server.mjs",
-    "check": "node --check server.mjs && node --check public/site.js && node --check public/file-mode-notice.js && node --check public/auth.js && node --check public/app.js && node --check public/admin.js && node --check public/admin-setup.js && node --check public/map.js && node --check public/landing-map.js && node --check public/phone.js"
+    "check": "node --check server.mjs && node --check private-pages.mjs && node --check public/site.js && node --check public/file-mode-notice.js && node --check public/auth.js && node --check public/app.js && node --check public/admin.js && node --check public/admin-setup.js && node --check public/map.js && node --check public/landing-map.js && node --check public/phone.js"
   },
   "engines": {
     "node": ">=20.19.0"
