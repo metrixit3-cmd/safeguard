@@ -122,6 +122,8 @@ The Express app exports a Vercel-compatible handler. Static assets are served fr
 
 Do not set `MONGODB_URI` to `127.0.0.1` in production: it points to the deployment container, not your computer. GPS collection requires a paired phone with an open, permission-granted companion page; browser hosting does not provide OS-level remote lock or reset protection.
 
+See [.env.example](.env.example) for the required variable names. It contains placeholders only; never commit real credentials.
+
 ## Documentation
 
 - [Local setup](documentation/setup.md)
