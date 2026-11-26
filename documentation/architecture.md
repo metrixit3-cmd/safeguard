@@ -4,7 +4,7 @@ The Express service serves the public site, authentication page, customer worksp
 
 ## Identity and routing
 
-`POST /api/auth/register` creates a customer account and starts a 30-day trial. `POST /api/auth/login` verifies credentials and returns the stored/configured role (`customer` or `admin`). Passwords use bcrypt cost 12. The account JWT is an HttpOnly cookie: SameSite=Lax over local HTTP and SameSite=None; Secure on HTTPS. Customer sessions route to `/app.html`; admin sessions route to `/admin.html`. A protected bootstrap endpoint uses `ADMIN_EMAILS` plus `ADMIN_BOOTSTRAP_SECRET`; alternatively use trusted database provisioning to grant admin role. Admin pages and APIs enforce the role server-side.
+`POST /api/auth/register` creates a customer account and starts a 30-day trial. `POST /api/auth/login` verifies credentials and returns the stored/configured role (`customer` or `admin`). Passwords use bcrypt cost 12. The account JWT is an HttpOnly cookie: SameSite=Lax over local HTTP and SameSite=None; Secure on HTTPS. Customer sessions land on `/overview` (`/app.html` remains an alias); admin sessions route to `/admin.html`. A protected bootstrap endpoint uses `ADMIN_EMAILS` plus `ADMIN_BOOTSTRAP_SECRET`; alternatively use trusted database provisioning to grant admin role. Admin pages and APIs enforce the role server-side.
 
 ## Device path
 
@@ -18,5 +18,5 @@ The dashboard uses MapLibre GL JS with OpenFreeMap dark, CARTO street and Esri i
 
 ## Theft Mode and platform limits
 
-The owner toggles persistent Theft Mode state. The phone companion checks the state every 2.5 seconds while open. It can show an in-page red overlay, vibrate where supported, and play generated browser audio after a user gesture. This is not an OS lock, native device-management action, push delivery or guaranteed background alert. Native SIM, Android Enterprise and Apple MDM services are not integrated.
+The owner toggles persistent Theft Mode state. New devices start with Theft Mode off. The phone companion checks the no-cache REST state endpoint every two seconds while open, allowing state synchronization through serverless requests. It can show an in-page red overlay, vibrate where supported, and play generated browser audio after a user gesture. This is not an OS lock, native device-management action, push delivery or guaranteed background alert. Native SIM, Android Enterprise and Apple MDM services are not integrated.
 

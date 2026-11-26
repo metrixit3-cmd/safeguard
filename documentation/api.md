@@ -15,23 +15,24 @@ All routes are served by the same Express service. Dashboard and admin pages aut
 - `GET /api/auth/me` — authenticated account role, trial dates and storage mode.
 - `GET /api/admin/overview` — admin-only overview with customer/device counts, currently active Theft Mode devices, audit events and queue status.
 
-`/admin.html` and admin API data require the `admin` role. Provision admins through the one-time bootstrap secret and email allowlist or trusted database provisioning; public signup cannot set a role. Customers are routed to `/app.html`; admins are routed to `/admin.html`.
+`/admin.html` and admin API data require the `admin` role. Provision admins through the one-time bootstrap secret and email allowlist or trusted database provisioning; public signup cannot set a role. Customers land on `/overview`; `/app.html` remains an alias. Admins are routed to `/admin.html`.
 
 ## Account devices
 
 - `GET /api/devices` — current owner's devices, latest location and recent events.
 - `GET /api/dashboard` — device list, counts, trial and storage mode.
 - `GET /api/events` — current owner's timestamped security events.
+- `PATCH /api/devices/:id` `{ name, platform }` — edits an owned device. Supported platform values are `iPhone`, `iPad`, `Android`, and `Other`.
 - `PATCH /api/devices/:id/theft-mode` `{ active: boolean }` — updates Theft Mode and logs an event.
 - `PATCH /api/devices/:id/protection` `{ sirenEnabled: boolean }` or `{ locationSharingEnabled: boolean }` — updates companion preferences and logs an event.
 - `GET /api/devices/:id/events` — event history for an owned device.
-- `POST /api/devices/pair-account` `{ email, password, name, platform, clientKey }` — verifies credentials, links/upserts the phone record for the browser identifier, revokes its prior phone token and returns a scoped phone JWT.
+- `POST /api/devices/pair-account` `{ email, password, name, platform, clientKey }` — verifies credentials, links/upserts the phone record for the browser identifier, revokes its prior phone token and returns a scoped phone JWT. New devices start with Theft Mode off. The companion detects iPhone/iPad/Android from browser platform hints and user-agent data.
 
 The phone identifier is a random UUID held by the browser and SHA-256 hashed in MongoDB. Repeated sign-in from the same browser and account updates the existing device record.
 
 ## Phone companion
 
-- `GET /api/phone/state` — returns Theft Mode, siren/location preferences and linked-device identity.
+- `GET /api/phone/state` — returns Theft Mode, siren/location preferences and linked-device identity. The phone polls this no-cache endpoint every two seconds while connected.
 - `POST /api/phone/location` `{ latitude, longitude, accuracy }` — validates and stores the latest browser GPS report. Disabled location sharing rejects reports. A location event is added at most once every 10 minutes.
 - `POST /api/phone/unpair` — revokes the current phone token and records an unpair event.
 - `GET /phone` — phone companion page, supporting account sign-in and account creation before pairing.

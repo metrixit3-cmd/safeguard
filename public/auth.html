@@ -1,1 +1,66 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080d18"><title>Sign in · SAFEGUARD</title><link rel="icon" href="./brand.svg" type="image/svg+xml"><link rel="stylesheet" href="./styles.css"></head><body class="auth-page"><header class="container nav"><a class="brand" href="./index.html"><img src="./brand.svg" alt=""><span>SAFEGUARD</span></a><a href="./index.html" class="button small">Back to home</a></header><main class="container auth-wrap"><section class="card auth-card"><a class="brand" href="./index.html"><img src="./brand.svg" alt=""><span>SAFEGUARD</span></a><div style="margin-top:26px"><span class="eyebrow">Your security account</span><h1 id="authHeading">Welcome back</h1><p class="muted" id="authSub">Sign in to manage your devices.</p></div><div class="tabs" role="tablist"><button class="tab active" type="button" role="tab" aria-selected="true" data-auth="login">Sign in</button><button class="tab" type="button" role="tab" aria-selected="false" data-auth="register">Create account · 30-day trial</button></div><form id="authForm"><div class="field" id="nameField" hidden><label for="authName">Full name</label><input id="authName" name="name" autocomplete="name" maxlength="100" minlength="2"></div><div class="field"><label for="authEmail">Email</label><input id="authEmail" type="email" autocomplete="username" required maxlength="254"></div><div class="field" style="margin-top:13px"><label for="authPassword">Password</label><div class="password-field"><input id="authPassword" type="password" autocomplete="current-password" required minlength="10" maxlength="72"><button class="password-toggle" type="button" data-password-toggle="authPassword" aria-label="Show password" aria-pressed="false">◉</button></div></div><div class="field" id="confirmField" hidden style="margin-top:13px"><label for="authConfirmPassword">Confirm password</label><div class="password-field"><input id="authConfirmPassword" type="password" autocomplete="new-password" minlength="10" maxlength="72"><button class="password-toggle" type="button" data-password-toggle="authConfirmPassword" aria-label="Show confirm password" aria-pressed="false">◉</button></div></div><div id="authError" role="alert" class="form-error"></div><button class="button primary" style="width:100%;margin-top:14px" id="authSubmit">Sign in securely</button></form><p class="muted" style="font-size:11px;margin-top:14px">Your account password is bcrypt-hashed on the server. Phone companion sign-in creates a separate device-scoped session.</p><p class="muted" style="font-size:11px;margin-top:10px">Setting up SAFEGUARD operations? <a href="./admin-setup.html" style="color:var(--teal)">Provision the first administrator</a>.</p></section></main><script src="./file-mode-notice.js"></script><script src="./auth.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080d18">
+  <title>Sign in · SAFEGUARD</title><link rel="icon" href="./brand.svg" type="image/svg+xml"><link rel="stylesheet" href="./styles.css">
+</head>
+<body class="auth-page">
+  <header class="container nav"><a class="brand" href="./index.html"><img src="./brand.svg" alt=""><span>SAFEGUARD</span></a><a href="./index.html" class="button small">Back to home</a></header>
+  <main class="container auth-wrap">
+    <section class="card auth-card" aria-live="polite">
+      <a class="brand auth-mark" href="./index.html"><img src="./brand.svg" alt=""><span>SAFEGUARD</span></a>
+
+      <section class="auth-view" id="loginView">
+        <div class="auth-heading"><span class="eyebrow">Your security account</span><h1>Welcome back</h1><p class="muted">Log in to manage your devices and security settings.</p></div>
+        <div class="social-stack" aria-label="Log in with a social account">
+          <div class="google-button-wrap"><div id="googleButtonLogin"></div><button class="social-button" id="googleUnavailableLogin" type="button"><span class="social-icon google-icon" aria-hidden="true">G</span><span>Log in with Google</span></button></div>
+          <button class="social-button" type="button" data-provider="facebook"><span class="social-icon facebook-icon" aria-hidden="true">f</span><span>Log in with Facebook</span></button>
+          <button class="social-button" type="button" data-provider="apple"><svg class="social-svg apple-mark" aria-hidden="true" viewBox="0 0 24 24"><path d="M16.6 12.8c0-2 1.6-3 1.7-3.1-1-1.4-2.6-1.6-3.2-1.6-1.4-.1-2.7.8-3.4.8-.7 0-1.8-.8-3-.8-1.5 0-2.9.9-3.7 2.2-1.6 2.7-.4 6.6 1.1 8.8.8 1.1 1.6 2.3 2.8 2.2 1.1 0 1.6-.7 3-.7s1.9.7 3.1.7c1.3 0 2-.1 2.8-1.3.9-1.2 1.2-2.4 1.2-2.5-.1 0-2.4-.9-2.4-4.7ZM14.4 6.7c.6-.8 1.1-1.9 1-3-1 .1-2.2.7-2.9 1.5-.6.7-1.2 1.8-1 2.9 1.1.1 2.2-.6 2.9-1.4Z"/></svg><span>Log in with Apple</span></button>
+        </div>
+        <div class="auth-divider"><span>or continue with email</span></div>
+        <form id="loginForm" novalidate>
+          <div class="field"><label for="loginEmail">Email</label><input id="loginEmail" name="email" type="email" autocomplete="username" required maxlength="254"></div>
+          <div class="field"><div class="field-label-row"><label for="loginPassword">Password</label><button class="text-link" type="button" data-view="forgot">Forgot password?</button></div><div class="password-field"><input id="loginPassword" name="password" type="password" autocomplete="current-password" required minlength="10" maxlength="72"><button class="password-toggle" type="button" data-password-toggle="loginPassword" aria-label="Show password" aria-pressed="false">◉</button></div></div>
+          <p id="loginError" role="alert" class="form-error" hidden></p><button class="button primary auth-submit" id="loginSubmit" type="submit">Log in</button>
+        </form>
+        <p class="auth-switch">Don't have an account yet? <button class="text-link" type="button" data-view="signup">Sign up</button></p>
+      </section>
+
+      <section class="auth-view" id="signupView" hidden>
+        <button class="auth-back" type="button" data-view="login" aria-label="Back to login">← <span>Back</span></button>
+        <div class="auth-heading"><span class="eyebrow">30-day free trial</span><h1>Choose sign up method</h1><p class="muted">Choose how you'd like to create your account.</p></div>
+        <div class="social-stack" aria-label="Sign up with a social account">
+          <div class="google-button-wrap"><div id="googleButtonSignup"></div><button class="social-button" id="googleUnavailableSignup" type="button"><span class="social-icon google-icon" aria-hidden="true">G</span><span>Sign up with Google</span></button></div>
+          <button class="social-button" type="button" data-provider="facebook"><span class="social-icon facebook-icon" aria-hidden="true">f</span><span>Sign up with Facebook</span></button>
+          <button class="social-button" type="button" data-provider="apple"><svg class="social-svg apple-mark" aria-hidden="true" viewBox="0 0 24 24"><path d="M16.6 12.8c0-2 1.6-3 1.7-3.1-1-1.4-2.6-1.6-3.2-1.6-1.4-.1-2.7.8-3.4.8-.7 0-1.8-.8-3-.8-1.5 0-2.9.9-3.7 2.2-1.6 2.7-.4 6.6 1.1 8.8.8 1.1 1.6 2.3 2.8 2.2 1.1 0 1.6-.7 3-.7s1.9.7 3.1.7c1.3 0 2-.1 2.8-1.3.9-1.2 1.2-2.4 1.2-2.5-.1 0-2.4-.9-2.4-4.7ZM14.4 6.7c.6-.8 1.1-1.9 1-3-1 .1-2.2.7-2.9 1.5-.6.7-1.2 1.8-1 2.9 1.1.1 2.2-.6 2.9-1.4Z"/></svg><span>Sign up with Apple</span></button>
+        </div>
+        <div class="auth-divider"><span>or create an account with email</span></div>
+        <form id="signupForm" novalidate>
+          <div class="field"><label for="signupName">Full name</label><input id="signupName" name="name" autocomplete="name" required maxlength="100" minlength="2"></div>
+          <div class="field"><label for="signupEmail">Email</label><input id="signupEmail" name="email" type="email" autocomplete="email" required maxlength="254"></div>
+          <div class="field"><label for="signupPassword">Password</label><div class="password-field"><input id="signupPassword" name="password" type="password" autocomplete="new-password" required minlength="10" maxlength="72"><button class="password-toggle" type="button" data-password-toggle="signupPassword" aria-label="Show password" aria-pressed="false">◉</button></div></div>
+          <div class="field"><label for="signupConfirm">Confirm password</label><div class="password-field"><input id="signupConfirm" name="confirmPassword" type="password" autocomplete="new-password" required minlength="10" maxlength="72"><button class="password-toggle" type="button" data-password-toggle="signupConfirm" aria-label="Show confirm password" aria-pressed="false">◉</button></div></div>
+          <p id="signupError" role="alert" class="form-error" hidden></p><button class="button primary auth-submit" id="signupSubmit" type="submit">Create account · start trial</button>
+        </form>
+        <p class="auth-switch">Already have an account? <button class="text-link" type="button" data-view="login">Log in</button></p>
+      </section>
+
+      <section class="auth-view" id="forgotView" hidden>
+        <button class="auth-back" type="button" data-view="login" aria-label="Back to login">← <span>Back to log in</span></button>
+        <div class="auth-heading"><span class="eyebrow">Account recovery</span><h1>Reset your password</h1><p class="muted">Enter your account email and we'll send a secure reset link if the account exists.</p></div>
+        <form id="forgotForm" novalidate><div class="field"><label for="forgotEmail">Email</label><input id="forgotEmail" name="email" type="email" autocomplete="email" required maxlength="254"></div><p id="forgotMessage" role="status" class="form-message" hidden></p><p id="forgotError" role="alert" class="form-error" hidden></p><button class="button primary auth-submit" id="forgotSubmit" type="submit">Send reset link</button></form>
+      </section>
+
+      <section class="auth-view" id="resetView" hidden>
+        <div class="auth-heading"><span class="eyebrow">Account recovery</span><h1>Choose a new password</h1><p class="muted">Use at least 10 characters. Your other sessions will be signed out.</p></div>
+        <form id="resetForm" novalidate><div class="field"><label for="resetPassword">New password</label><div class="password-field"><input id="resetPassword" type="password" autocomplete="new-password" required minlength="10" maxlength="72"><button class="password-toggle" type="button" data-password-toggle="resetPassword" aria-label="Show password" aria-pressed="false">◉</button></div></div><div class="field"><label for="resetConfirm">Confirm new password</label><div class="password-field"><input id="resetConfirm" type="password" autocomplete="new-password" required minlength="10" maxlength="72"><button class="password-toggle" type="button" data-password-toggle="resetConfirm" aria-label="Show confirm password" aria-pressed="false">◉</button></div></div><p id="resetError" role="alert" class="form-error" hidden></p><button class="button primary auth-submit" id="resetSubmit" type="submit">Set new password</button></form>
+      </section>
+
+      <p class="auth-footnote">Passwords are encrypted in transit and bcrypt-hashed on SAFEGUARD servers. Creating an account starts a 30-day trial.</p>
+      <p class="muted auth-admin-link">Setting up SAFEGUARD operations? <a href="./admin-setup.html">Provision the first administrator</a>.</p>
+      <div class="auth-toast" id="authToast" role="status" aria-live="polite" hidden></div>
+    </section>
+  </main>
+  <script src="./file-mode-notice.js"></script><script src="./auth.js"></script>
+</body>
+</html>

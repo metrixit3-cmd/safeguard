@@ -92,9 +92,14 @@ Phone GPS requires a secure context. For a real phone, serve the app through HTT
 |---|---|
 | `/` | Product home and interactive map preview |
 | `/auth.html` | Customer sign in and account creation |
-| `/app.html` | Authenticated customer dashboard |
+| `/overview` | Authenticated customer Overview (default after customer sign-in) |
+| `/app.html` | Authenticated customer dashboard, retained as an alias |
 | `/admin.html` | Admin-only operations dashboard |
 | `/admin-setup.html` | First administrator provisioning |
+
+### Authentication providers
+
+Email/password registration and sign-in are available with the MongoDB connection. Google Identity Services is enabled by setting `GOOGLE_CLIENT_ID` to a Web OAuth client ID and adding the deployed site origin to that client’s authorized JavaScript origins. Google ID tokens are verified server-side against that client ID. Password recovery requires `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS`, and `APP_BASE_URL`; `SMTP_PORT`, `SMTP_SECURE`, and `SMTP_FROM` can tune the mail transport. Reset links expire after 30 minutes and successful resets invalidate existing account sessions. Facebook and Apple buttons display Coming soon until their OAuth flows are configured.
 | `/phone` | Account-based phone browser companion |
 | `/api/health` | Server and persistence mode status |
 
