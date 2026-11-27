@@ -1,10 +1,7 @@
 import * as maplibregl from 'https://unpkg.com/maplibre-gl@6.19.0/dist/maplibre-gl.mjs';
 
 const DEFAULT_CENTER = [39.6461, -0.4532];
-const OSM_TILES = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-const CARTO_DARK_TILES = 'https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
 const ESRI_IMAGERY = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
-const CARTO_BASEMAP_KEY = await fetch('/api/map/config', { cache: 'no-store' }).then(response => response.ok ? response.json() : {}).then(config => config.cartoBasemapKey || '').catch(() => '');
 const markers = new WeakMap();
 
 function rasterStyle(name, tiles, attribution, maxzoom = 19) {
@@ -19,13 +16,9 @@ function rasterStyle(name, tiles, attribution, maxzoom = 19) {
 }
 
 const styles = {
-  dark: {
-    label: '3D Dark',
-    style: CARTO_BASEMAP_KEY ? rasterStyle('SAFEGUARD Dark', CARTO_DARK_TILES + '?key=' + encodeURIComponent(CARTO_BASEMAP_KEY), '© OpenStreetMap contributors © CARTO') : 'https://tiles.openfreemap.org/styles/dark'
-  },
   street: {
     label: 'Street Map',
-    style: rasterStyle('OpenStreetMap', OSM_TILES, '© OpenStreetMap contributors', 19)
+    style: 'https://tiles.openfreemap.org/styles/liberty'
   },
   satellite: {
     label: 'Satellite',
@@ -45,7 +38,7 @@ const styles = {
 
 function addBuildings(map) {
   if (!map.getSource('safeguard-buildings')) {
-    map.addSource('safeguard-buildings', { type: 'vector', url: 'https://tiles.openfreemap.org/planet' });
+    map.addSource('safeguard-buildings', { type: 'vector', url: 'https://tiles.openfreemap.org/planet', attribution: 'OpenFreeMap © OpenMapTiles, data from OpenStreetMap' });
   }
   if (map.getLayer('safeguard-3d-buildings')) return;
   map.addLayer({
@@ -66,11 +59,10 @@ function addBuildings(map) {
 
 export function createMap(container, initialLocation = null, { showStatus = true } = {}) {
   const center = initialLocation ? [initialLocation.longitude, initialLocation.latitude] : DEFAULT_CENTER;
-  let activeStyleKey = 'dark';
-  let darkFallbackLevel = 0;
+  let activeStyleKey = 'street';
   const map = new maplibregl.Map({
     container,
-    style: styles.dark.style,
+    style: styles.street.style,
     center,
     zoom: 15,
     pitch: 60,
@@ -84,7 +76,7 @@ export function createMap(container, initialLocation = null, { showStatus = true
 
   map.on('style.load', () => {
     map.resize();
-    if (activeStyleKey === 'dark') addBuildings(map);
+    if (activeStyleKey === 'street') addBuildings(map);
   });
 
   const switcher = document.createElement('div');
@@ -103,17 +95,14 @@ export function createMap(container, initialLocation = null, { showStatus = true
     button.type = 'button';
     button.dataset.style = key;
     button.textContent = styles[key].label;
-    button.className = `map-style-button ${key === 'dark' ? 'active' : ''}`;
-    button.setAttribute('aria-pressed', String(key === 'dark'));
+    button.className = `map-style-button ${key === 'street' ? 'active' : ''}`;
+    button.setAttribute('aria-pressed', String(key === 'street'));
     button.addEventListener('click', () => {
       activeStyleKey = key;
-      darkFallbackLevel = 0;
       failed = false;
       activateStyle(key);
       map.setStyle(styles[key].style);
-      map.setPitch(key === 'dark' ? 60 : 0);
-      map.setBearing(key === 'dark' ? -20 : 0);
-      requestAnimationFrame(() => map.resize());
+      requestAnimationFrame(() => { map.resize(); map.setPitch(60); });
     });
     switcher.append(button);
   }
@@ -125,20 +114,19 @@ export function createMap(container, initialLocation = null, { showStatus = true
   if (showStatus) container.append(status);
   if (initialLocation) updateLocationStatus(container, `Last GPS report · ${new Date(initialLocation.recordedAt).toLocaleString()}`);
 
-  map.on('error', event => {
-    if (activeStyleKey === 'dark' && darkFallbackLevel < 2 && event.error?.status) {
-      darkFallbackLevel += 1;
-      map.setStyle(darkFallbackLevel === 1 ? 'https://tiles.openfreemap.org/styles/dark' : styles.street.style);
-      if (darkFallbackLevel === 2) map.setPitch(0);
-      requestAnimationFrame(() => map.resize());
-      return;
-    }
+  map.on('error', () => {
     if (!failed) {
       failed = true;
       if (showStatus) status.textContent = 'Map tiles are unavailable. Location reports remain saved; try another map style.';
     }
   });
 
+  const resizeObserver = new ResizeObserver(() => {
+    if (container.clientWidth && container.clientHeight) map.resize();
+  });
+  resizeObserver.observe(container);
+  map.on('remove', () => resizeObserver.disconnect());
+  map.once('load', () => map.resize());
   requestAnimationFrame(() => map.resize());
   return map;
 }

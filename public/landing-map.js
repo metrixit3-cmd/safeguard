@@ -13,5 +13,6 @@ if (el) {
     }
   } catch { /* Use the default map center when no saved phone location is available. */ }
   const map = createMap(el, location);
+  requestAnimationFrame(() => map.resize());
   if (location) map.once('load', () => showLocation(map, null, location, 'Latest phone GPS report'));
 }
