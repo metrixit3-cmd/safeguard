@@ -11,7 +11,7 @@ if (el) {
         location = data.devices.map(device => device.location).filter(Boolean).sort((a,b) => new Date(b.recordedAt)-new Date(a.recordedAt))[0] || null;
       }
     }
-  } catch { /* Keep the public map free of invented device markers. */ }
+  } catch { /* Use the default map center when no saved phone location is available. */ }
   const map = createMap(el, location);
-  if (location) map.once('load', () => showLocation(map, null, location));
+  if (location) map.once('load', () => showLocation(map, null, location, 'Latest phone GPS report'));
 }

@@ -10,7 +10,7 @@ The Express service serves the public site, authentication page, customer worksp
 
 The phone companion signs in or creates an account over HTTPS, then pairs using account credentials. A browser-generated UUID is hashed and upserted by account so repeat sign-ins update that phone. The API returns a 30-day device-scoped JWT, stored in local storage; it is not an account token. The companion submits GPS every three seconds while active. MongoDB retains the latest coordinate and recent security events.
 
-The dashboard uses MapLibre GL JS with OpenFreeMap dark, CARTO street and Esri imagery styles, a mapped building extrusion layer, and markers only for reported GPS coordinates. Coverage and building heights vary by area and depend on external tile providers.
+The dashboard uses MapLibre GL JS with CARTO Dark Matter tiles (when CARTO_BASEMAP_KEY is configured) and OpenFreeMap dark tiles as a fallback for its tilted 3D Dark view, OpenStreetMap raster tiles for Street Map, and Esri World Imagery for Satellite. A pulsing marker appears only for a saved GPS report. Coverage and building heights vary by area and depend on external tile providers.
 
 ## Admin operations
 

@@ -11,6 +11,7 @@ Configure these Vercel environment variables for Production and Preview as neede
 - `ADMIN_EMAILS`: comma-separated administrator addresses.
 - `ADMIN_BOOTSTRAP_SECRET`: a temporary high-entropy secret only while provisioning the first administrator; remove it afterward.
 - `GOOGLE_CLIENT_ID`: optional Web OAuth client ID; configure the production website origin in Google Cloud Console.
+- CARTO_BASEMAP_KEY: optional browser-facing basemap key returned by /api/map/config; restrict its allowed origins to your production domain. Without it, 3D Dark uses OpenFreeMap. CARTO failures fall back to OpenFreeMap dark, then OpenStreetMap.
 - `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS`, `APP_BASE_URL`: required for password-reset emails. `SMTP_PORT` defaults to `587`, `SMTP_SECURE` defaults to `false` (port 465 enables TLS), and `SMTP_FROM` defaults to `SMTP_USER`.
 
 Production API routes require MongoDB. If it is missing or unreachable, they return a clear 503 response instead of creating volatile in-memory accounts. Check `/api/health` and require `{"status":"ok","database":"connected"}` before account/device use. Never set production `MONGODB_URI` to `127.0.0.1`.
@@ -21,7 +22,7 @@ Build command: `npm ci`. Start command: `npm start`. Bind the public listener to
 
 ## Security and operations
 
-Use HTTPS, suitable proxy trust configuration, request monitoring and process lifecycle management. Never commit credentials. Restrict MongoDB network access and encrypt backups. The map uses OpenFreeMap's public dark style, OpenStreetMap raster tiles for the street view, and Esri World Imagery for satellite view. CARTO's anonymous `dark_all` endpoint returns an API-key-required placeholder, so the dark view uses the public OpenFreeMap style instead.
+Use HTTPS, suitable proxy trust configuration, request monitoring and process lifecycle management. Never commit credentials. Restrict MongoDB network access and encrypt backups. The 3D Dark view uses CARTO Dark Matter when CARTO_BASEMAP_KEY is set and otherwise uses OpenFreeMap dark tiles, with OpenFreeMap and OpenStreetMap fallbacks. Street Map uses OpenStreetMap raster tiles; Satellite uses Esri World Imagery (native zoom 17). Keep visible tile attribution and follow each provider's terms.
 
 Behind one trusted TLS-terminating proxy or Cloudflare Tunnel, set `TRUST_PROXY=1` so Express recognizes HTTPS and emits Secure; SameSite=None session cookies. Credentialed CORS accepts the exact HTTPS request host, loopback HTTP for local development, and exact additional origins configured through `CORS_ALLOWED_ORIGINS`. Avoid wildcard CORS for tunnel domains because arbitrary tunnel tenants could otherwise read credentialed account data.
 
