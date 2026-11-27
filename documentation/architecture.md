@@ -10,7 +10,7 @@ The Express service serves the public site, authentication page, customer worksp
 
 The phone companion signs in or creates an account over HTTPS, then pairs using account credentials. A browser-generated UUID is hashed and upserted by account so repeat sign-ins update that phone. The API returns a 30-day device-scoped JWT, stored in local storage; it is not an account token. The companion submits GPS every three seconds while active. MongoDB retains the latest coordinate and recent security events.
 
-Landing and dashboard maps share a MapLibre GL JS implementation with OpenFreeMap vector streets and 3D building extrusions, plus an Esri World Imagery satellite layer. A pulsing marker appears only for a saved GPS report. Coverage and building heights vary by area and depend on external tile providers.
+The dashboard uses MapLibre GL JS with OpenFreeMap Positron and building extrusions for its 3D Light style, Esri light gray canvas tiles for Street Map, and Esri World Imagery with transportation and place-label overlays for Satellite Hybrid. A pulsing marker shows the latest reported GPS coordinates or the documented default map center while waiting for the first report. Coverage and building heights vary by area and depend on external tile providers.
 
 Google sign-in uses a server-side OAuth 2.0 authorization-code flow with `state` and `nonce` validation, verified Google identity claims, and a signed HttpOnly account cookie. Configure `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `APP_BASE_URL`; register the exact `${APP_BASE_URL}/api/auth/google/callback` redirect URI with Google.
 

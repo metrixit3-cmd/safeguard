@@ -22,7 +22,7 @@ Build command: `npm ci`. Start command: `npm start`. Bind the public listener to
 
 ## Security and operations
 
-Use HTTPS, suitable proxy trust configuration, request monitoring and process lifecycle management. Never commit credentials. Restrict MongoDB network access and encrypt backups. The Street Map layer uses OpenFreeMap vector tiles and 3D building extrusions; Satellite uses Esri World Imagery (native zoom 17). Both map surfaces share the same MapLibre implementation. Keep visible tile attribution and follow each provider's terms.
+Use HTTPS, suitable proxy trust configuration, request monitoring and process lifecycle management. Never commit credentials. Restrict MongoDB network access and encrypt backups. The 3D Light view uses OpenFreeMap's Positron style with public building geometry for extrusions; Street Map uses Esri's light gray canvas tiles. Satellite Hybrid combines Esri World Imagery with Esri transportation and place-label overlays. Keep visible tile attribution and follow each provider's terms.
 
 Behind one trusted TLS-terminating proxy or Cloudflare Tunnel, set `TRUST_PROXY=1` so Express recognizes HTTPS and emits Secure; SameSite=None session cookies. Credentialed CORS accepts the exact HTTPS request host, loopback HTTP for local development, and exact additional origins configured through `CORS_ALLOWED_ORIGINS`. Avoid wildcard CORS for tunnel domains because arbitrary tunnel tenants could otherwise read credentialed account data.
 
