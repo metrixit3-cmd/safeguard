@@ -38,7 +38,8 @@ These repository images are **illustrative interface previews**, not screenshots
 - Browser GPS reports sent about every three seconds while the paired companion is open, permitted, connected, and running.
 - Dashboard location map with MapLibre GL JS, dark/street/satellite styles, building extrusions, and the latest received device marker.
 - Theft Mode state sync, an in-page alert, and browser siren audio after the user enables audio on the phone.
-- Timestamped device events, customer dashboard sections, admin overview, and a process-memory fallback when MongoDB is unavailable.
+- Paginated platform administration, customer suspension/reset workflows, device heartbeat telemetry, and append-only admin action records.
+- Owner-scoped native-agent registration and command APIs with optional high-priority FCM HTTP v1 delivery.
 
 ## Important capability limits
 
@@ -99,7 +100,11 @@ Phone GPS requires a secure context. For a real phone, serve the app through HTT
 
 ### Authentication providers
 
-Email/password registration and sign-in are available with the MongoDB connection. Google Identity Services is enabled by setting `GOOGLE_CLIENT_ID` to a Web OAuth client ID and adding the deployed site origin to that client’s authorized JavaScript origins. Google ID tokens are verified server-side against that client ID. Password recovery requires `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS`, and `APP_BASE_URL`; `SMTP_PORT`, `SMTP_SECURE`, and `SMTP_FROM` can tune the mail transport. Reset links expire after 30 minutes and successful resets invalidate existing account sessions. Facebook and Apple buttons display Coming soon until their OAuth flows are configured.
+Email/password registration and sign-in use the configured database. Google uses a server-side OAuth 2.0 authorization-code flow. Configure `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `APP_BASE_URL`, then add `${APP_BASE_URL}/api/auth/google/callback` as an authorized redirect URI in the Google OAuth client. Google identities must have a verified email. Password recovery requires `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS`, and `APP_BASE_URL`; `SMTP_PORT`, `SMTP_SECURE`, and `SMTP_FROM` tune the mail transport. Reset links expire after 30 minutes and successful resets invalidate existing account sessions.
+
+### Native Android command delivery
+
+The dashboard stores command state and can send push messages through Firebase Cloud Messaging HTTP v1. Configure `FIREBASE_PROJECT_ID` and either `FIREBASE_SERVICE_ACCOUNT`, `FIREBASE_SERVICE_ACCOUNT_JSON`, or Application Default Credentials. A native Android/iOS client must register its token through the authenticated agent endpoint and implement/acknowledge each command. This repository does not include that native client; its browser companion can show foreground alerts and permissioned location reports but cannot enforce OS lock, anti-flash, reset guard, SIM monitoring, or maximum-volume audio.
 | `/phone` | Account-based phone browser companion |
 | `/api/health` | Server and persistence mode status |
 
@@ -118,12 +123,14 @@ The service exposes account, device pairing, GPS, Theft Mode, security event, da
 
 ## Deploy to Vercel
 
-The Express app exports a Vercel-compatible handler. Static assets are served from `public/`; authenticated customer and admin HTML is bundled in a private server module and passes through server-side role checks. Production API requests require persistent MongoDB and fail clearly if it is unavailable instead of falling back to temporary memory.
+The Express app exports a Vercel-compatible handler. Static assets are served from `public/`; authenticated customer and admin HTML is kept in private server modules and passes through server-side role checks. Production API requests require persistent MongoDB and fail clearly if it is unavailable instead of falling back to temporary memory.
 
 1. Import `metrixit3-cmd/safeguard` into a Vercel project with the repository root as the project root. Vercel detects the Express app in `server.mjs`.
 2. Add `MONGODB_URI` using a MongoDB Atlas connection string. Allow the Vercel function to reach the Atlas cluster and keep the database username/password private.
 3. Add `JWT_SECRET` as a randomly generated secret with at least 32 characters. Add `ADMIN_EMAILS` with the administrator email. Set `ADMIN_BOOTSTRAP_SECRET` only while creating the first administrator, then remove it.
-4. Deploy. Check `/api/health`; it should return `{"status":"ok","database":"connected"}` before using account, device, or GPS features.
+4. For Google sign-in, configure `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `APP_BASE_URL` to the exact deployment origin. Register `${APP_BASE_URL}/api/auth/google/callback` in the OAuth client's authorized redirect URIs.
+5. For native push, configure `FIREBASE_PROJECT_ID` plus a Firebase service-account JSON variable or Application Default Credentials; install a native client that calls `/api/devices/register-agent` and implements the commands.
+6. Deploy. Check `/api/health`; it should return `{"status":"ok","database":"connected"}` before using account, device, or GPS features.
 
 Do not set `MONGODB_URI` to `127.0.0.1` in production: it points to the deployment container, not your computer. GPS collection requires a paired phone with an open, permission-granted companion page; browser hosting does not provide OS-level remote lock or reset protection.
 

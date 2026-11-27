@@ -12,11 +12,13 @@ The phone companion signs in or creates an account over HTTPS, then pairs using 
 
 Landing and dashboard maps share a MapLibre GL JS implementation with OpenFreeMap vector streets and 3D building extrusions, plus an Esri World Imagery satellite layer. A pulsing marker appears only for a saved GPS report. Coverage and building heights vary by area and depend on external tile providers.
 
-Social buttons use real Google Identity Services sign-in when `GOOGLE_CLIENT_ID` is configured. When a provider is not configured, the server can issue a rate-limited, isolated 12-hour demo session. It does not link or impersonate a real identity and does not create a stored customer account.
+Google sign-in uses a server-side OAuth 2.0 authorization-code flow with `state` and `nonce` validation, verified Google identity claims, and a signed HttpOnly account cookie. Configure `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `APP_BASE_URL`; register the exact `${APP_BASE_URL}/api/auth/google/callback` redirect URI with Google.
 
 ## Admin operations
 
-`GET /api/admin/overview` requires an admin session and returns account/device counts, paired devices, active Theft Mode records and device audit events. Command queue count is zero because command dispatch is not configured.
+Admin APIs use paginated MongoDB queries and expose limited account/device metadata. Routine dashboards omit GPS coordinates and command payloads. `AdminAudit` records administrator requests as append-only records. A device-bound support escalation has a reason, a 15-minute lifetime, and separately scoped one-use authorization for location or command access. The service does not expose audit mutation routes, though deployment-level database permissions are needed to make the collection tamper-proof against database operators.
+
+Customers can register a native agent for an owned device with `POST /api/devices/register-agent`. Device control updates are persisted and dispatched as high-priority FCM HTTP v1 data messages when the registered agent token and service-account credentials are configured. `/api/phone/commands` provides polling and acknowledgements. This repo does not contain the native Android/iOS app that consumes those messages, so FCM acceptance alone does not mean an OS action was performed.
 
 ## Theft Mode and platform limits
 

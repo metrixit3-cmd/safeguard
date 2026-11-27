@@ -18,10 +18,8 @@
           <p id="loginError" role="alert" class="form-error" hidden></p><button class="button primary auth-submit" id="loginSubmit" type="submit">Sign in securely</button>
         </form>
         <div class="auth-divider"><span>OR CONTINUE WITH</span></div>
-        <div class="social-stack" aria-label="Log in with a social account">
-          <div class="google-button-wrap"><div id="googleButtonLogin"></div><button class="social-button" id="googleUnavailableLogin" type="button"><span class="social-icon google-icon" aria-hidden="true">G</span><span>Log in with Google</span></button></div>
-          <button class="social-button" type="button" data-provider="facebook"><span class="social-icon facebook-icon" aria-hidden="true">f</span><span>Log in with Facebook</span></button>
-          <button class="social-button" type="button" data-provider="apple"><span class="social-icon" aria-hidden="true">&#63743;</span><span>Log in with Apple</span></button>
+        <div class="social-stack" aria-label="Continue with Google">
+          <a class="social-button google-oauth" id="googleOAuthLogin" href="/api/auth/google"><span class="social-icon google-icon" aria-hidden="true">G</span><span>Continue with Google</span><span class="social-arrow" aria-hidden="true">↗</span></a>
         </div>
         <p class="auth-switch">Don't have an account yet? <button class="text-link" type="button" data-view="signup">Sign up</button></p>
       </section>
@@ -36,10 +34,8 @@
           <p id="signupError" role="alert" class="form-error" hidden></p><button class="button primary auth-submit" id="signupSubmit" type="submit">Create account and start trial</button>
         </form>
         <div class="auth-divider"><span>OR CONTINUE WITH</span></div>
-        <div class="social-stack" aria-label="Sign up with a social account">
-          <div class="google-button-wrap"><div id="googleButtonSignup"></div><button class="social-button" id="googleUnavailableSignup" type="button"><span class="social-icon google-icon" aria-hidden="true">G</span><span>Sign up with Google</span></button></div>
-          <button class="social-button" type="button" data-provider="facebook"><span class="social-icon facebook-icon" aria-hidden="true">f</span><span>Sign up with Facebook</span></button>
-          <button class="social-button" type="button" data-provider="apple"><span class="social-icon" aria-hidden="true">&#63743;</span><span>Sign up with Apple</span></button>
+        <div class="social-stack" aria-label="Continue with Google">
+          <a class="social-button google-oauth" id="googleOAuthSignup" href="/api/auth/google"><span class="social-icon google-icon" aria-hidden="true">G</span><span>Continue with Google</span><span class="social-arrow" aria-hidden="true">↗</span></a>
         </div>
         <p class="auth-switch">Already have an account? <button class="text-link" type="button" data-view="login">Log in</button></p>
       </section>
@@ -55,7 +51,6 @@
       </section>
 
       <p class="auth-footnote">Passwords are encrypted in transit and bcrypt-hashed on SAFEGUARD servers. Creating an account starts a 30-day trial.</p>
-      <p class="muted auth-admin-link">Setting up SAFEGUARD operations? <a href="./admin-setup.html">Provision the first administrator</a>.</p>
       <div class="auth-toast" id="authToast" role="status" aria-live="polite" hidden></div>
     </section>
   </main>

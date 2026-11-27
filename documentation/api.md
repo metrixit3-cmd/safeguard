@@ -13,7 +13,12 @@ All routes are served by the same Express service. Dashboard and admin pages aut
 - `POST /api/auth/login` `{ email, password }` — verifies credentials, sets a session cookie, and returns `user.role` (`customer` or `admin`).
 - `POST /api/auth/logout` — clears the session cookie.
 - `GET /api/auth/me` — authenticated account role, trial dates and storage mode.
-- `GET /api/admin/overview` — admin-only overview with customer/device counts, currently active Theft Mode devices, audit events and queue status.
+- `GET /api/auth/google` and `GET /api/auth/google/callback` — state/nonce-protected Google OAuth 2.0 authorization-code flow; configure `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `APP_BASE_URL`, and the exact callback URI in Google Cloud.
+- `GET /api/admin/overview`, `/api/admin/telemetry`, `/api/admin/customers`, `/api/admin/devices`, `/api/admin/theft-cases`, `/api/admin/support-escalations`, `/api/admin/audit` — admin-only, paginated overview and operational data. Routine admin responses omit customer GPS coordinates and command payloads.
+- `PATCH /api/admin/customers/:id/status` — suspend or reactivate an account and revoke its existing sessions.
+- `POST /api/admin/customers/:id/password-reset` — emails a one-time reset link; requires SMTP configuration.
+- `POST /api/admin/support-escalations` — creates a reason-bound, device-bound token with one-use scopes (`location` or `commands`) that expires in 15 minutes.
+- `GET /api/admin/devices/:id/location` and `POST /api/admin/devices/:id/command` — require an admin session and a matching `X-Support-Escalation` token. Location and command access are written to the append-only admin audit collection.
 
 `/admin.html` and admin API data require the `admin` role. Provision admins through the one-time bootstrap secret and email allowlist or trusted database provisioning; public signup cannot set a role. Customers land on `/overview`; `/app.html` remains an alias. Admins are routed to `/admin.html`.
 
@@ -25,6 +30,8 @@ All routes are served by the same Express service. Dashboard and admin pages aut
 - `PATCH /api/devices/:id` `{ name, platform }` — edits an owned device. Supported platform values are `iPhone`, `iPad`, `Android`, and `Other`.
 - `PATCH /api/devices/:id/theft-mode` `{ active: boolean }` — updates Theft Mode and logs an event.
 - `PATCH /api/devices/:id/protection` `{ sirenEnabled: boolean }` or `{ locationSharingEnabled: boolean }` — updates companion preferences and logs an event.
+- `POST /api/devices/:id/command` `{ action, enabled? }` — owner-only command dispatch for `locate_now`, `maximum_volume_siren`, `theft_mode`, `full_lockdown_anti_flash`, or `sim_tamper_alert`.
+- `POST /api/devices/register-agent` `{ deviceId, platform, osVersion, fcmToken, enrollmentMode }` — owner-authenticated native-agent registration; `platform` is `Android` or `iOS`, and enrollment mode is `DEVICE_OWNER` or `STANDARD` (iOS uses `STANDARD`). Returns a device-scoped agent token.
 - `GET /api/devices/:id/events` — event history for an owned device.
 - `POST /api/devices/pair-account` `{ email, password, name, platform, clientKey }` — verifies credentials, links/upserts the phone record for the browser identifier, revokes its prior phone token and returns a scoped phone JWT. New devices start with Theft Mode off. The companion detects iPhone/iPad/Android from browser platform hints and user-agent data.
 
@@ -33,6 +40,7 @@ The phone identifier is a random UUID held by the browser and SHA-256 hashed in 
 ## Phone companion
 
 - `GET /api/phone/state` — returns Theft Mode, siren/location preferences and linked-device identity. The phone polls this no-cache endpoint every two seconds while connected.
+- `GET /api/phone/commands` and `POST /api/phone/commands/ack` — native-agent command polling and acknowledgement using the device-scoped bearer token.
 - `POST /api/phone/location` `{ latitude, longitude, accuracy }` — validates and stores the latest browser GPS report. Disabled location sharing rejects reports. A location event is added at most once every 10 minutes.
 - `POST /api/phone/unpair` — revokes the current phone token and records an unpair event.
 - `GET /phone` — phone companion page, supporting account sign-in and account creation before pairing.
