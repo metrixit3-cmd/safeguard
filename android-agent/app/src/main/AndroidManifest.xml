@@ -1,0 +1,53 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+
+    <application
+        android:name=".SafeguardApplication"
+        android:allowBackup="false"
+        android:icon="@drawable/ic_safeguard"
+        android:label="SAFEGUARD Agent"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Safeguard"
+        android:usesCleartextTraffic="false">
+        <activity android:name=".LockdownActivity" android:excludeFromRecents="true" android:exported="false" android:launchMode="singleTask" android:showWhenLocked="true" android:turnScreenOn="true" />
+        <activity android:name=".MainActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <receiver android:name=".SafeguardDeviceAdminReceiver" android:description="@string/device_admin_description" android:exported="true" android:label="SAFEGUARD Device Protection" android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <meta-data android:name="android.app.device_admin" android:resource="@xml/device_admin_policies" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".SimStateReceiver" android:exported="false" android:permission="android.permission.READ_PHONE_STATE">
+            <intent-filter><action android:name="android.intent.action.SIM_STATE_CHANGED" /></intent-filter>
+        </receiver>
+        <receiver android:name=".BootReceiver" android:exported="false">
+            <intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /></intent-filter>
+        </receiver>
+
+        <service android:name=".SafeguardFirebaseMessagingService" android:exported="false">
+            <intent-filter><action android:name="com.google.firebase.MESSAGING_EVENT" /></intent-filter>
+        </service>
+        <service android:name=".LocationForegroundService" android:exported="false" android:foregroundServiceType="location" />
+        <service android:name=".SirenService" android:exported="false" android:foregroundServiceType="mediaPlayback" />
+    </application>
+</manifest>

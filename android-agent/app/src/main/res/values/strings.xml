@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">SAFEGUARD Agent</string>
+    <string name="device_admin_description">Allows SAFEGUARD to lock this device when you request Theft Lockdown.</string>
+    <string name="notification_channel_protection">Device protection</string>
+    <string name="notification_channel_siren">Theft alarm</string>
+    <string name="notification_channel_location">Location sharing</string>
+    <string name="lockdown_notification_title">SAFEGUARD Theft Lockdown</string>
+    <string name="lockdown_notification_body">This phone is in owner-authorized protection mode.</string>
+</resources>
